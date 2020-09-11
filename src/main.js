@@ -14,7 +14,7 @@ let mongoport = 27017;
 const mongoURL = 'mongodb://127.0.0.1:' + mongoport;
 const databaseName = 'ShoppingLists';
 
-app.use(express.static(path.join(__dirname, '../client')));
+app.use(express.static(path.join(__dirname, '../web')));
 
 app.get('/lists', (req, res) => {
     if ( req.query.list === "grocery" ) {
