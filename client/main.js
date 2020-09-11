@@ -16,7 +16,7 @@ function showList(list) {
     body.style.transition = 'opacity '+0.4+'s ease';
     body.style.opacity = 0;
     window.setTimeout(function() {
-        fetch('http://localhost:3000/lists?list=' + list)
+        fetch(window.location.href + 'lists?list=' + list)
             .then(response => response.json())
             .then(data => writeListHTML(data, body));
         window.scrollTo(window.scrollX, 0);
