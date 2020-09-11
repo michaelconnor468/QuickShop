@@ -1,0 +1,154 @@
+body, html 
+{
+    font-family: "SF Pro Display","SF Pro Icons","Helvetica Neue","Helvetica","Arial",sans-serif;
+    text-align: center;
+    color: #000000;
+    height: 100%;
+    margin: 0;
+    background-color: white;
+}
+
+#header 
+{
+    font-size: 3rem;
+    font-weight: 400;
+    width: 100%;
+    margin: 0;
+    height: 8%;
+    display: flex;
+    align-items: center;
+    color: green;
+    background-color: white;
+    box-shadow: 1px 1px 12px gray;
+}
+
+#header_logo
+{
+    height: 80%;
+    float: left;
+    margin-left: 1%;
+}
+
+#main_body
+{
+    width: 80%;
+    height: 100%;
+    margin: auto;
+    padding: 0;
+}
+
+#nav_links
+{
+    width: 100%;
+    height: 80%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: auto;
+    padding: 0;
+}
+
+#nav_links div
+{
+    float:left;
+    margin: 10%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    transition: 0.15s;
+}
+
+/* Contains number below nav image specifiying amount of items on current list */
+#nav_links div div
+{
+    height: 10%;
+    font-weight: 1000;
+    font-size: 2em;
+    color: darkred;
+}
+
+#nav_links div:hover
+{
+    opacity: 80%;
+}
+
+#nav_links div:active
+{
+    transition:0.05s;
+    opacity: 90%;
+}
+
+#nav_links div img
+{
+    height: 100%;
+    width: 100%;
+}
+
+.itemlist
+{
+    font-size: 6rem;
+    height: 100%;
+    margin: 0;
+    font-family: "SF Pro Display","SF Pro Icons","Helvetica Neue","Helvetica","Arial",sans-serif;
+    list-style-type: none;
+    text-align: left;
+}
+
+.itemlist em
+{
+    font-size: 0.2em;
+}
+
+.itemlist li
+{
+    padding: 2rem;
+}
+
+.itemlist li:nth-child(even)
+{
+    background-color: rgba(120, 120, 120, 0.2);
+}
+
+.itemlist li details summary:focus 
+{
+    outline: none;
+}
+
+.itemlist li details > p
+{
+    padding: 0;
+    margin: 0;
+}
+
+.itemlist li details summary
+{
+    display: flex;
+    justify-content: space-between;
+}
+
+.itemlist li details p ul
+{
+    padding: 0;
+}
+
+.itemlist li details p li
+{
+    list-style-type: none;
+    list-style-position: inside;
+    margin: 0;
+    padding: 0;
+    padding-left: 6rem;
+    font-size: 0.6em;
+}
+
+#checkmark
+{
+    height: 6rem;
+    width: 6rem;
+}
+
+.summary_div_right
+{
+    float: right;
+}
