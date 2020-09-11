@@ -5,8 +5,10 @@ function setup(event) {
     document.getElementById('nav_grocery_logo').addEventListener('keydown', () => showList('grocery')); 
     document.getElementById('nav_household_logo').addEventListener('click', () => showList('household'));
     document.getElementById('nav_household_logo').addEventListener('keydown', () => showList('household')); 
-    fetch(window.location.href + 'lists?list=grocery').then(response => response.json()).then(data => {document.getElementById('nav_grocery_amount').innerHTML = data.items.length});
-    fetch(window.location.href + 'lists?list=household').then(response => response.json()).then(data => {document.getElementById('nav_household_amount').innerHTML = data.items.length});
+    document.getElementById('header_logo').addEventListener('click', () => location.reload());
+    document.getElementById('header_logo').addEventListener('keydown', () => location.reload()); 
+    fetch(window.location.href + 'lists?list=grocery').then(response => response.json()).then(data => {if (data.items.length > 0) document.getElementById('nav_grocery_amount').innerHTML = data.items.length;});
+    fetch(window.location.href + 'lists?list=household').then(response => response.json()).then(data => {if (data.items.length > 0) document.getElementById('nav_household_amount').innerHTML = data.items.length;});
 }
 
 

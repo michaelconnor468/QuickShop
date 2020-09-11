@@ -14,17 +14,26 @@ var argv = require('yargs')
 let port = argv.p;
 let mongoport = argv.m;
 
-const mongoURL = 'mongodb://127.0.0.1:' + mongoport;
-const databaseName = 'ShoppingLists';
-
 app.use(express.static(path.join(__dirname, '../client')));
+
+let grocery = {items: []}
+let household = {items: []}
+
+mongoc.connect('mongodb://127.0.0.1:' + mongoport, {useNewUrlParser: true, useUnifiedTopology: true}, (error, client) => {
+    if ( error )
+        return console.log('Unable to connect to database.');
+
+    const db = client.db('ShoppingLists');
+    db.collection('grocery').find().toArray(( error, array ) => {grocery.items = array});
+    db.collection('household').find().toArray(( error, array ) => {household.items = array});
+});
 
 app.get('/lists', (req, res) => {
     if ( req.query.list === "grocery" ) {
-        res.send({items: [{item: 'apple', quantity: 4, preferences: 'honey crisp, red delicious', alternatives: 'berries'}, {item: 'banana', quantity: 1, preferences: 'regular', alternatives: ''}]});
+        res.send( grocery );
     }
     else if ( req.query.list === "household" ) {
-        res.send({items: [{item: 'toilet paper', quantity: 1, preferences: 'ultra soft', alternatives: ''}]});
+        res.send( household );
     }
 });
 
