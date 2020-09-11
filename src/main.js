@@ -1,20 +1,23 @@
 const express = require('express');
-const yargs = require('yargs');
 const path = require('path');
 const mongodb = require('mongodb');
 
 const mongoc = mongodb.MongoClient;
 const app = express();
 
-let port = 3000;
-let mongoport = 27017;
+// Process command line args
+var argv = require('yargs')
+    .usage('Usage: $0 -p [server port *required*] -m [mongodb port *required*] -d [debug]')
+    .demandOption(['p','m'])
+    .argv;
 
-//TODO process args
+let port = argv.p;
+let mongoport = argv.m;
 
 const mongoURL = 'mongodb://127.0.0.1:' + mongoport;
 const databaseName = 'ShoppingLists';
 
-app.use(express.static(path.join(__dirname, '../web')));
+app.use(express.static(path.join(__dirname, '../client')));
 
 app.get('/lists', (req, res) => {
     if ( req.query.list === "grocery" ) {
@@ -25,8 +28,8 @@ app.get('/lists', (req, res) => {
     }
 });
 
-app.listen(3000, () => {
-    console.log('Server running on port' + port);
+app.listen(port, () => {
+    console.log('Server running on port ' + port);
 });
 
 

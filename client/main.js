@@ -5,8 +5,8 @@ function setup(event) {
     document.getElementById('nav_grocery_logo').addEventListener('keydown', () => showList('grocery')); 
     document.getElementById('nav_household_logo').addEventListener('click', () => showList('household'));
     document.getElementById('nav_household_logo').addEventListener('keydown', () => showList('household')); 
-    fetch('http://localhost:3000/lists?list=grocery').then(response => response.json()).then(data => {document.getElementById('nav_grocery_amount').innerHTML = data.items.length});
-    fetch('http://localhost:3000/lists?list=household').then(response => response.json()).then(data => {document.getElementById('nav_household_amount').innerHTML = data.items.length});
+    fetch(window.location.href + 'lists?list=grocery').then(response => response.json()).then(data => {document.getElementById('nav_grocery_amount').innerHTML = data.items.length});
+    fetch(window.location.href + 'lists?list=household').then(response => response.json()).then(data => {document.getElementById('nav_household_amount').innerHTML = data.items.length});
 }
 
 
