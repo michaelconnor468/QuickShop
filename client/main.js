@@ -20,13 +20,13 @@ function showList(list) {
     window.setTimeout(function() {
         fetch(window.location.href + 'lists?list=' + list)
             .then(response => response.json())
-            .then(data => writeListHTML(data, body));
+            .then(data => writeListHTML(data, body, list));
         window.scrollTo(window.scrollX, 0);
         window.setTimeout( function() {body.style.opacity = 1;}, 100); // Timeout necessary here to prevent flicker
     }, 400);
 }
 
-function writeListHTML(data, body) {
+function writeListHTML(data, body, shoppinglist) {
     body.innerHTML = '';
     let list = document.createElement("UL"); 
     list.className = 'itemlist';
@@ -57,8 +57,31 @@ function writeListHTML(data, body) {
         node.appendChild(details);
         list.appendChild(node); 
     });
+    let node = document.createElement("LI");
+    node.setAttribute('id', 'add_item');
+    node.setAttribute('data-expanded', 'false');
+    node.appendChild(document.createElement("DIV"));
+    node.childNodes.item(0).innerHTML = '<img id="plus" src="resources/plus.png"> Add Item';
+    node.childNodes.item(0).addEventListener('click', () => showAddToListForm(shoppinglist));
+    //node.addEventListener('mousedown', () => showAddToListForm(shoppinglist));
+    list.appendChild(node);
 }
 
 function removeFromList(element) {
 
+}
+
+function showAddToListForm(list) {
+    let node = document.getElementById('add_item');
+    if ( node.getAttribute('data-expanded') === 'false' ) {
+        // TODO expand form
+        let form = document.createElement("FORM");
+        form.setAttribute('id', 'add_item_form');
+        node.appendChild(form);
+        node.setAttribute('data-expanded', 'true');
+    }
+    else {
+        document.getElementById('add_item_form').remove();
+        node.setAttribute('data-expanded', 'false');
+    }
 }

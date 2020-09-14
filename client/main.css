@@ -142,6 +142,13 @@ body, html
     font-size: 0.6em;
 }
 
+#plus
+{
+    height: 4rem;
+    width: 4rem;
+    vertical-align: center;
+}
+
 #checkmark
 {
     height: 6rem;

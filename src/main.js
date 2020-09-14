@@ -1,9 +1,10 @@
 const express = require('express');
 const path = require('path');
 const mongodb = require('mongodb');
+const { dodgerblue } = require('color-name');
 
 const mongoc = mongodb.MongoClient;
-const app = express();
+const expressApp = express();
 
 // Process command line args
 var argv = require('yargs')
@@ -11,34 +12,47 @@ var argv = require('yargs')
     .demandOption(['p','m'])
     .argv;
 
-let port = argv.p;
-let mongoport = argv.m;
-
-app.use(express.static(path.join(__dirname, '../client')));
-
 let grocery = {items: []}
 let household = {items: []}
 
-mongoc.connect('mongodb://127.0.0.1:' + mongoport, {useNewUrlParser: true, useUnifiedTopology: true}, (error, client) => {
+let shoppingLists = [
+    {
+        name: 'grocery',
+        items: []
+    },
+    {
+        name: 'household',
+        items: []
+    }
+]
+
+mongodb.MongoClient.connect('mongodb://127.0.0.1:' + argv.m, {useNewUrlParser: true, useUnifiedTopology: true}, (error, client) => {
     if ( error )
         return console.log('Unable to connect to database.');
 
     const db = client.db('ShoppingLists');
-    db.collection('grocery').find().toArray(( error, array ) => {grocery.items = array});
-    db.collection('household').find().toArray(( error, array ) => {household.items = array});
+
+    shoppingLists.forEach( (list) => {
+        db.collection(list.name).find().toArray( (error, array) => {
+            if ( error )
+                console.log('Failed to find list ' + list.name + ' in database');
+            list.items = array;
+        });
+    });
 });
 
-app.get('/lists', (req, res) => {
-    if ( req.query.list === "grocery" ) {
-        res.send( grocery );
-    }
-    else if ( req.query.list === "household" ) {
-        res.send( household );
-    }
+expressApp.use(express.static(path.join(__dirname, '../client')));
+
+expressApp.get('/lists', (req, res) => {
+    shoppingLists.forEach( (list) => {
+        if ( req.query.list === list.name) {
+            res.send( list );
+        }
+    });
 });
 
-app.listen(port, () => {
-    console.log('Server running on port ' + port);
+expressApp.listen(argv.p, () => {
+    console.log('Server running on port ' + argv.p);
 });
 
 
