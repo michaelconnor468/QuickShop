@@ -1,5 +1,6 @@
 window.addEventListener('load', (event)=>setup(event) );
 let ListBuffer = []
+let ListNames = ['grocery', 'household']
 
 function setup(event) {
     document.getElementById('nav_grocery_logo').addEventListener('click', () => showList('grocery'));
@@ -8,7 +9,6 @@ function setup(event) {
     document.getElementById('nav_household_logo').addEventListener('keydown', () => showList('household')); 
     document.getElementById('header_logo').addEventListener('click', () => location.reload());
     document.getElementById('header_logo').addEventListener('keydown', () => location.reload()); 
-    // TODO move listbuffer stuff to area which creates list in browser so each element can be easily assosiated with a node
     fetch(window.location.href + 'lists?list=grocery')
         .then(response => response.json())
         .then(data => {
@@ -24,8 +24,6 @@ function setup(event) {
             ListBuffer.push(data.items);
         });
 }
-
-
 
 function showList(list) {
     let body = document.getElementById("main_body");
@@ -48,11 +46,6 @@ function writeListHTML(data, body, shoppinglist) {
     let firstelement = true;
     data.items.forEach(element => {
         let node = document.createElement("LI");
-        // fetch(window.location.href + 'pages/listnode.html')
-        //     .then(response => response.text())
-        //     .then(data => {node = createElementFromHTML(data)});
-        // TODO make the rest async with this
-        
         let details = document.createElement("DETAILS");
         let summary = document.createElement("SUMMARY");
         let summary_left = document.createElement("DIV");
@@ -137,4 +130,21 @@ function createElementFromHTML(htmlString) {
     let div = document.createElement('div');
     div.innerHTML = htmlString.trim();
     return div.firstChild; 
-  }
+}
+
+async function updateListBuffer() {
+    ListNames.forEach( (list) => {
+        fetch(window.location.href + 'lists?list=' + list)
+            .then(response => response.json())
+            .then(data => {
+                ListBuffer.forEach((list) => {
+                    if ( list.name === list ) {
+                        list = data.items;
+                    }
+                    else {
+                        ListBuffer.push(data.items);
+                    }
+                });
+            });
+    });
+}
