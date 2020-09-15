@@ -26,52 +26,43 @@ function showList(list) {
     body.style.transition = 'opacity '+0.4+'s ease';
     body.style.opacity = 0;
     window.setTimeout(function() {
-        fetch(window.location.href + 'lists?list=' + list)
-            .then(response => response.json())
-            .then(data => writeListHTML(data, body, list));
+        writeListHTML(body, list);
         window.scrollTo(window.scrollX, 0);
         window.setTimeout( function() {body.style.opacity = 1;}, 100); // Timeout necessary here to prevent flicker
     }, 400);
 }
 
-function writeListHTML(data, body, shoppinglist) {
+function writeListHTML(body, shoppinglist) {
     body.innerHTML = '';
     let htmlList = document.createElement("UL"); 
     htmlList.className = 'itemlist';
     body.appendChild(htmlList);
-    let firstelement = true;
-    data.items.forEach(element => {
-        let node = document.createElement("LI");
-        let details = document.createElement("DETAILS");
-        let summary = document.createElement("SUMMARY");
-        let summary_left = document.createElement("DIV");
-        let summary_right = document.createElement("DIV");
-        summary_right.className = 'summary_div_right';
-        let p = document.createElement("p");
-        summary_left.innerHTML = capitalizeFirstLetter(element.item);
-        if ( firstelement ) {
-            summary_left.innerHTML = summary_left.innerHTML + ' <em>Click Me!</em>';
-            firstelement = false;
-        }
-        summary_right.innerHTML = "<img id=\"checkmark\" src=\"resources/checkmark.png\">";
-        summary_right.addEventListener('click', (event) => {removeFromList(element); node.remove();});
-        summary_right.addEventListener('mousedown', (event) => {removeFromList(element); node.remove();});
-        p.innerHTML = "<ul><li>quantity: " + element.quantity + "</li><li>preferences: " + element.preferences + "</li><li>alternatives: " + element.alternatives + "</li></ul>";
-        summary.appendChild(summary_left);
-        summary.appendChild(summary_right);
-        details.appendChild(summary);
-        details.appendChild(p);
-        node.appendChild(details);
-        htmlList.appendChild(node); 
-    });
-    let node = document.createElement("LI");
-    node.setAttribute('id', 'add_item');
-    node.setAttribute('data-expanded', 'false');
-    node.appendChild(document.createElement("DIV"));
-    node.childNodes.item(0).innerHTML = '<img id="plus" src="resources/plus.png"> Add Item';
-    node.childNodes.item(0).addEventListener('click', () => showAddToListForm(shoppinglist));
-    //node.addEventListener('mousedown', () => showAddToListForm(shoppinglist));
-    htmlList.appendChild(node);
+    // Html structure kept in separate file as creating these in pure js made for hard to understand and modify code
+    fetch('pages/listnode.html')
+        .then(response => response.text())
+        .then((html) => {
+            let firstelement = true;
+            ListBuffer.find((el) => {return el.name === shoppinglist}).items.forEach(element => {
+                let node = (new DOMParser).parseFromString(html, 'text/html').body.firstChild;
+                node.querySelector('.summary_div_left').innerHTML = capitalizeFirstLetter(element.item);
+                if ( firstelement ) {
+                    node.querySelector('.summary_div_left').innerHTML = node.querySelector('.summary_div_left').innerHTML + ' <em>Click Me!</em>';
+                    firstelement = false;
+                }
+                node.querySelector('.summary_div_right').addEventListener('click', (event) => {removeFromList(element); node.remove();});
+                node.querySelector('.summary_div_right').addEventListener('mousedown', (event) => {removeFromList(element); node.remove();});
+                node.querySelector('p').innerHTML = 
+                    `<ul><li>quantity: ${element.quantity} </li><li>preferences: ${element.preferences} </li><li>alternatives: ${element.alternatives} </li></ul>`;
+                htmlList.appendChild(node);
+            });
+            let node = document.createElement("LI");
+            node.setAttribute('id', 'add_item');
+            node.setAttribute('data-expanded', 'false');
+            node.appendChild(document.createElement("DIV"));
+            node.childNodes.item(0).innerHTML = '<img id="plus" src="resources/plus.png"> Add Item';
+            node.childNodes.item(0).addEventListener('click', () => showAddToListForm(shoppinglist));
+            htmlList.appendChild(node);
+        });
 }
 
 function removeFromList(element) {
