@@ -9,22 +9,18 @@ function setup(event) {
     document.getElementById('nav_household_logo').addEventListener('keydown', () => showList('household')); 
     document.getElementById('header_logo').addEventListener('click', () => location.reload());
     document.getElementById('header_logo').addEventListener('keydown', () => location.reload()); 
-    fetch(window.location.href + 'lists?list=grocery')
-        .then(response => response.json())
-        .then(data => {
-            if (data.items.length > 0) 
-                document.getElementById('nav_grocery_amount').innerHTML = data.items.length;
-            ListBuffer.push(data.items);
-        });
-    fetch(window.location.href + 'lists?list=household')
-        .then(response => response.json())
-        .then(data => {
-            if (data.items.length > 0) 
-                document.getElementById('nav_household_amount').innerHTML = data.items.length;
-            ListBuffer.push(data.items);
-        });
+    
+    // Initializes each list and the gui count displays on main page
+    updateListBuffer(() => {
+        ListBuffer.forEach((list) => {  
+            if ( list.items.length != 0 && ListNames.includes(list.name) ) 
+                document.getElementById(`nav_${list.name}_amount`).innerHTML = list.items.length; 
+            });
+    });  
 }
 
+// Switches body of webpage to corresponding list through a gentle gradiant fade
+// doing so instead of switching pages provides for a smoother user experience
 function showList(list) {
     let body = document.getElementById("main_body");
     body.style.transition = 'opacity '+0.4+'s ease';
@@ -40,9 +36,9 @@ function showList(list) {
 
 function writeListHTML(data, body, shoppinglist) {
     body.innerHTML = '';
-    let list = document.createElement("UL"); 
-    list.className = 'itemlist';
-    body.appendChild(list);
+    let htmlList = document.createElement("UL"); 
+    htmlList.className = 'itemlist';
+    body.appendChild(htmlList);
     let firstelement = true;
     data.items.forEach(element => {
         let node = document.createElement("LI");
@@ -66,7 +62,7 @@ function writeListHTML(data, body, shoppinglist) {
         details.appendChild(summary);
         details.appendChild(p);
         node.appendChild(details);
-        list.appendChild(node); 
+        htmlList.appendChild(node); 
     });
     let node = document.createElement("LI");
     node.setAttribute('id', 'add_item');
@@ -75,7 +71,7 @@ function writeListHTML(data, body, shoppinglist) {
     node.childNodes.item(0).innerHTML = '<img id="plus" src="resources/plus.png"> Add Item';
     node.childNodes.item(0).addEventListener('click', () => showAddToListForm(shoppinglist));
     //node.addEventListener('mousedown', () => showAddToListForm(shoppinglist));
-    list.appendChild(node);
+    htmlList.appendChild(node);
 }
 
 function removeFromList(element) {
@@ -132,19 +128,21 @@ function createElementFromHTML(htmlString) {
     return div.firstChild; 
 }
 
-async function updateListBuffer() {
+async function updateListBuffer(callback) {
     ListNames.forEach( (list) => {
         fetch(window.location.href + 'lists?list=' + list)
             .then(response => response.json())
             .then(data => {
+                let alreadyContained = false;
                 ListBuffer.forEach((list) => {
-                    if ( list.name === list ) {
-                        list = data.items;
-                    }
-                    else {
-                        ListBuffer.push(data.items);
-                    }
+                    if ( list.name === list ) { 
+                        list = data;
+                        alreadyContained = true;
+                    }                   
                 });
+                if ( !alreadyContained ) 
+                    ListBuffer.push(data);
+                callback();
             });
     });
 }
