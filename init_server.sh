@@ -8,6 +8,7 @@ function init_npm {
     npm i mongodb
     npm i express
     npm i yargs
+    npm i body-parser
 }
 
 function echo_help {

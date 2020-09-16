@@ -8,15 +8,33 @@ function setup(event) {
     document.getElementById('nav_grocery_logo').addEventListener('keydown', () => showList('grocery')); 
     document.getElementById('nav_household_logo').addEventListener('click', () => showList('household'));
     document.getElementById('nav_household_logo').addEventListener('keydown', () => showList('household')); 
-    document.getElementById('header_logo').addEventListener('click', () => location.reload());
-    document.getElementById('header_logo').addEventListener('keydown', () => location.reload()); 
+    ['click', 'mousedown'].forEach((event) => {
+        document.getElementById('header_logo').addEventListener(event, () => {
+            location.reload();
+            setTimeout(() => {
+                updateListBuffer(() => {
+                    ListBuffer.forEach((list) => {  
+                        if ( list.items.length != 0 && ListNames.includes(list.name) ) {
+                            let count = 0;
+                            list.items.forEach((x) => {if (!x.hidden) count++;})
+                            document.getElementById(`nav_${list.name}_amount`).innerHTML = count; 
+                        }
+                    });
+                });  
+            }, 50);
+        });
+    });
+    // document.getElementById('header_logo').addEventListener('keydown', () => location.reload()); 
     
     // Initializes each list and the gui count displays on main page
     updateListBuffer(() => {
         ListBuffer.forEach((list) => {  
-            if ( list.items.length != 0 && ListNames.includes(list.name) ) 
-                document.getElementById(`nav_${list.name}_amount`).innerHTML = list.items.length; 
-            });
+            if ( list.items.length != 0 && ListNames.includes(list.name) ) {
+                let count = 0;
+                list.items.forEach((x) => {if (!x.hidden) count++;})
+                document.getElementById(`nav_${list.name}_amount`).innerHTML = count; 
+            }
+        });
     });  
 }
 
@@ -44,17 +62,19 @@ function writeListHTML(body, shoppinglist) {
         .then((html) => {
             let firstelement = true;
             ListBuffer.find((el) => {return el.name === shoppinglist}).items.forEach(element => {
-                let node = (new DOMParser).parseFromString(html, 'text/html').body.firstChild;
-                node.querySelector('.summary_div_left').innerHTML = capitalizeFirstLetter(element.item);
-                if ( firstelement ) {
-                    node.querySelector('.summary_div_left').innerHTML = node.querySelector('.summary_div_left').innerHTML + ' <em>Click Me!</em>';
-                    firstelement = false;
+                if ( !element.hidden ) {
+                    let node = (new DOMParser).parseFromString(html, 'text/html').body.firstChild;
+                    node.querySelector('.summary_div_left').innerHTML = capitalizeFirstLetter(element.item);
+                    if ( firstelement ) {
+                        node.querySelector('.summary_div_left').innerHTML = node.querySelector('.summary_div_left').innerHTML + ' <em>Click Me!</em>';
+                        firstelement = false;
+                    }
+                    node.querySelector('.summary_div_right').addEventListener('click', (event) => {removeFromList(element, shoppinglist); node.remove();});
+                    node.querySelector('.summary_div_right').addEventListener('mousedown', (event) => {removeFromList(element, shoppinglist); node.remove();});
+                    node.querySelector('p').innerHTML = 
+                        `<ul><li>quantity: ${element.quantity} </li><li>preferences: ${element.preferences} </li><li>alternatives: ${element.alternatives} </li></ul>`;
+                    htmlList.appendChild(node);
                 }
-                node.querySelector('.summary_div_right').addEventListener('click', (event) => {removeFromList(element); node.remove();});
-                node.querySelector('.summary_div_right').addEventListener('mousedown', (event) => {removeFromList(element); node.remove();});
-                node.querySelector('p').innerHTML = 
-                    `<ul><li>quantity: ${element.quantity} </li><li>preferences: ${element.preferences} </li><li>alternatives: ${element.alternatives} </li></ul>`;
-                htmlList.appendChild(node);
             });
             let node = document.createElement("LI");
             node.setAttribute('id', 'add_item');
@@ -66,8 +86,9 @@ function writeListHTML(body, shoppinglist) {
         });
 }
 
-function removeFromList(element) {
-
+function removeFromList(element, list) {
+    element.hidden = true;
+    fetch(window.location.href + 'lists?list=' + list, {method: 'PUT', body: JSON.stringify(element), headers: new Headers({'content-type': 'application/json'})});
 }
 
 function showAddToListForm(list) {
@@ -101,7 +122,8 @@ function showAddToListForm(list) {
                             item: document.getElementById("form_item").value,
                             preferences: document.getElementById("form_preferences").value,
                             quantity: document.getElementById("form_quantity").value,
-                            alternatives: document.getElementById("form_alternatives").value
+                            alternatives: document.getElementById("form_alternatives").value,
+                            hidden: false
                         }
                         let bufferedlistindex = ListBuffer.findIndex((bufferlist)=>{return bufferlist.name === list})
                         let bufferedlist = ListBuffer[bufferedlistindex].items;
@@ -116,6 +138,8 @@ function showAddToListForm(list) {
                             writeListHTML(document.getElementById('main_body'),list);
                         }
                         // TODO make this inform the server
+                        console.log(addedObject);
+                        fetch(window.location.href + 'lists?list=' + list, {method: 'PUT', body: JSON.stringify(addedObject), headers: new Headers({'content-type': 'application/json'})});
                     });
                 }); 
             });
