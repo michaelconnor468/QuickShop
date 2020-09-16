@@ -123,8 +123,13 @@ body, html
 
 .itemlist li details summary
 {
-    display: flex;
-    justify-content: space-between;
+    display: inline-block;
+    width: 100%;
+}
+
+.itemlist li details .summary_div_right
+{
+    float: right;
 }
 
 .itemlist li details p ul
@@ -142,6 +147,11 @@ body, html
     font-size: 0.6em;
 }
 
+.itemlist li details summary::-webkit-details-marker
+{
+    display: none;
+}
+
 #plus
 {
     height: 4rem;
@@ -151,8 +161,8 @@ body, html
 
 #checkmark
 {
-    height: 6rem;
-    width: 6rem;
+    height: 4rem;
+    width: 4rem;
 }
 
 .summary_div_right
