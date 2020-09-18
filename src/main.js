@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const mongodb = require('mongodb');
 const bodyParser = require('body-parser');
+const alexaLambda = require('./alexa-lambda.js');
 const { dodgerblue } = require('color-name');
 
 const mongoc = mongodb.MongoClient;
@@ -23,6 +24,18 @@ let shoppingLists = [
         items: []
     }
 ]
+
+// Integration with alexa module
+alexaLambda.itemAddedCallback((item, list) => {
+    mongodb.MongoClient.connect('mongodb://127.0.0.1:' + argv.m, {useNewUrlParser: true, useUnifiedTopology: true}, (error, client) => {
+        if ( error )
+            return console.log('Unable to connect to database.');
+    
+        const db = client.db('ShoppingLists');
+        db.collection(list).replaceOne({item: item}, req.body, {upsert: true}).catch();
+        res.send('Database updated');
+    });
+});
 
 mongodb.MongoClient.connect('mongodb://127.0.0.1:' + argv.m, {useNewUrlParser: true, useUnifiedTopology: true}, (error, client) => {
     if ( error )

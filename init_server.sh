@@ -9,6 +9,7 @@ function init_npm {
     npm i express
     npm i yargs
     npm i body-parser
+    npm i ask-sdk
 }
 
 function echo_help {

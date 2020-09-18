@@ -1,0 +1,54 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "quick shop",
+            "modelConfiguration": {
+                "fallbackIntentSensitivity": {
+                    "level": "LOW"
+                }
+            },
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.FallbackIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AddItem",
+                    "slots": [
+                        {
+                            "name": "list",
+                            "type": "AMAZON.DeviceType"
+                        },
+                        {
+                            "name": "item",
+                            "type": "AMAZON.Food"
+                        }
+                    ],
+                    "samples": [
+                        "remove {item} from {list} list",
+                        "remove {item} from {list}",
+                        "add {item} to {list} list",
+                        "add {item} to {list}"
+                    ]
+                }
+            ],
+            "types": []
+        }
+    }
+}
